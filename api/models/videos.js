@@ -17,8 +17,8 @@ var videoSchema = new mongoose.Schema({
     subtitles: {
         type: Array,
         of: {
-            start: Number,
-            end: Number,
+            startTime: Number,
+            endTime: Number,
             text: String
         },
         required: 'Subtitles are required'
