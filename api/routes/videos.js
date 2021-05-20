@@ -10,13 +10,17 @@ router.route("/")
     .get(async (request, response) => {
         try {
             let videos = [];
-            console.log(request.query.twitchUserId);
+            let searchObject = {};
 
-            if (!request.query.twitchUserId) {
-                videos = await Videos.find({}, null).exec();
-            } else {
-                videos = await Videos.find({twitchUserId: request.params.twitchUserId}, null).exec();
+            if (request.query.twitchUserId) {
+                searchObject["twitchUserId"] = request.query.twitchUserId;
+            } 
+
+            if (request.query.videoName) {
+                searchObject["name"] = request.query.videoName;
             }
+
+            videos = await Videos.find(searchObject, null).exec();
 
             return response.json(videos);
         } catch (error) {
