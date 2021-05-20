@@ -1,7 +1,7 @@
 const express = require('express');
 var router = express.Router();
 
-import {storeVideo, trimVideo, createPayloadZip, readFile, writeFile} from '../utils/VideoTools';
+import {storeVideo, createPayloadZip, readFile} from '../utils/VideoTools';
 var Videos = require('../models/videos');
 
 import {authenticatedUserHasRole, getAuthenticatedTwitchUserId} from '../utils/SecurityHelper';
@@ -10,10 +10,13 @@ router.route("/")
     .get(async (request, response) => {
         try {
             let videos = [];
+            console.log(request.query.twitchUserId);
 
             if (!request.query.twitchUserId) {
+                console.log("ALL");
                 videos = await Videos.find({}, null).exec();
             } else {
+                console.log("ONE");
                 videos = await Videos.find({twitchUserId: request.params.twitchUserId}, null).exec();
             }
 
