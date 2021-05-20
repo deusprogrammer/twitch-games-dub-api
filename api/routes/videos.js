@@ -28,7 +28,7 @@ router.route("/")
         }
     })
     .post(async (request, response) => {
-        if (!authenticatedUserHasRole("TWITCH_BROADCASTER")) {
+        if (!authenticatedUserHasRole(request, "TWITCH_BROADCASTER")) {
             response.status(401);
             return response.send("Forbidden");
         }
