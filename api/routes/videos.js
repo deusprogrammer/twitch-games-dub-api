@@ -13,10 +13,8 @@ router.route("/")
             console.log(request.query.twitchUserId);
 
             if (!request.query.twitchUserId) {
-                console.log("ALL");
                 videos = await Videos.find({}, null).exec();
             } else {
-                console.log("ONE");
                 videos = await Videos.find({twitchUserId: request.params.twitchUserId}, null).exec();
             }
 
@@ -50,7 +48,7 @@ router.route("/")
 router.route("/:id/zip")
     .get(async (request, response) => {
         try {
-        let video = await Videos.find({_id: request.params.id})
+        let video = await Videos.findOne({_id: request.params.id})
         let byteStream = await readFile(video.videoPath);
         let dataUri = await createPayloadZip(byteStream, video.subtitles);
         return response.json({
