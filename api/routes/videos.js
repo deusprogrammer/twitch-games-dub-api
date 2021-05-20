@@ -64,10 +64,9 @@ router.route("/:id")
 router.route("/:id/mp4")
     .get(async (request, response) => {
         try {
-        let video = await Videos.findOne({_id: request.params.id})
-        let byteStream = await readFile(video.videoPath);
+        let video = await Videos.findOne({_id: request.params.id});
         response.header("content-type", "video/mp4");
-        return response.sendFile(byteStream);
+        return response.sendFile(video.videoPath);
         } catch (error) {
             console.error(error);
             response.status(500);
