@@ -9,10 +9,9 @@ var videoSchema = new mongoose.Schema({
         type: "String",
         default: "Video"
     },
-    videoPath: {
+    videoUrl: {
         type: String,
-        required: 'Video path is required',
-        unique: true
+        required: 'Video url is required'
     },
     subtitles: {
         type: Array,

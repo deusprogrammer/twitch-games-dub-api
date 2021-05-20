@@ -1,6 +1,8 @@
 const express = require('express');
 var router = express.Router();
 
+import axios from 'axios';
+
 import {storeVideo, createPayloadZip, readFile} from '../utils/VideoTools';
 var Videos = require('../models/videos');
 
@@ -61,24 +63,27 @@ router.route("/:id")
         }
     });
 
-router.route("/:id/mp4")
-    .get(async (request, response) => {
-        try {
-        let video = await Videos.findOne({_id: request.params.id});
-        response.header("content-type", "video/mp4");
-        return response.sendFile(video.videoPath);
-        } catch (error) {
-            console.error(error);
-            response.status(500);
-            return response.send(error);
-        }
-    });
+// router.route("/:id/mp4")
+//     .get(async (request, response) => {
+//         try {
+//         let video = await Videos.findOne({_id: request.params.id});
+//         response.header("content-type", "video/mp4");
+//         return response.sendFile(video.videoPath);
+//         } catch (error) {
+//             console.error(error);
+//             response.status(500);
+//             return response.send(error);
+//         }
+//     });
 
 router.route("/:id/zip")
     .get(async (request, response) => {
         try {
         let video = await Videos.findOne({_id: request.params.id});
-        let byteStream = await readFile(video.videoPath);
+        let result = await axios.get(video.videoUrl, {
+            responseType: "arraybuffer"
+        });
+        let byteStream = result.data;
         let dataUri = await createPayloadZip(byteStream, video.subtitles);
         return response.json({
             dataUri

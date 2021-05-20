@@ -2,6 +2,7 @@ import Videos from "../models/videos";
 import ffmpeg from 'fluent-ffmpeg';
 import JSZip from 'jszip';
 import fs from 'fs';
+import axios from 'axios';
 
 const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
 ffmpeg.setFfmpegPath(ffmpegPath);
@@ -48,14 +49,20 @@ let convertSecondsToTimestamp = (seconds) => {
     return `${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")},${ms.toString().padStart(3, "0")}`;
 }
 
-export let storeVideo = async (name, videoByteStream, twitchUserId, subtitles) => {
-    var videoPath = `${GAME_DATA_BASE}/videos/${uuidv4()}.mp4`;
+export let storeVideo = async (name, base64ByteStream, twitchUserId, subtitles) => {
+    //var videoPath = `${GAME_DATA_BASE}/videos/${uuidv4()}.mp4`;
 
     try {
-        await writeFile(videoPath, videoByteStream);
+        //await writeFile(videoPath, videoByteStream);
+        let result = await axios.post("https://deusprogrammer.com/api/img-svc/media", {
+            imagePayload: base64ByteStream,
+            mimeType: "video/mp4",
+            title: name
+        });
+        let videoUrl = `https://deusprogrammer.com/api/img-svc/media/${result.data._id}/file`;
         return await Videos.create({
             name,
-            videoPath,
+            videoUrl,
             twitchUserId,
             subtitles
         });
@@ -64,38 +71,38 @@ export let storeVideo = async (name, videoByteStream, twitchUserId, subtitles) =
     }
 }
 
-let processVideo = (inputFilePath, outputFilePath, startTime, duration) => {
-    return new Promise((resolve, reject) => {
-        // Process video
-        let ts = convertSecondsToTimestamp(startTime);
-        ffmpeg(inputFilePath)
-            .videoCodec("libx264")
-            .setStartTime(ts.substring(0, ts.indexOf(",")))
-            .setDuration(duration)
-            .output(outputFilePath)
-            .on('end', function(err) {
-                if(!err) { 
-                    resolve();
-                }
-            })
-            .on('error', function(err){
-                reject(err);
-            }).run();
-    });
-}
+// let processVideo = (inputFilePath, outputFilePath, startTime, duration) => {
+//     return new Promise((resolve, reject) => {
+//         // Process video
+//         let ts = convertSecondsToTimestamp(startTime);
+//         ffmpeg(inputFilePath)
+//             .videoCodec("libx264")
+//             .setStartTime(ts.substring(0, ts.indexOf(",")))
+//             .setDuration(duration)
+//             .output(outputFilePath)
+//             .on('end', function(err) {
+//                 if(!err) { 
+//                     resolve();
+//                 }
+//             })
+//             .on('error', function(err){
+//                 reject(err);
+//             }).run();
+//     });
+// }
 
-export let trimVideo = async (videoByteStream, startTime, endTime) => {
-    var buffer = Buffer.from(videoByteStream, "base64");
-    var inputFilePath = `/tmp/working/${uuidv4()}-in.mp4`;
-    var outputFilePath = `/tmp/working/${uuidv4()}-in.mp4`;
-    try {
-        await writeFile(inputFilePath, buffer);
-        await processVideo(inputFilePath, outputFilePath, startTime, endTime - startTime);
-        return await readFile(outputFilePath);
-    } catch (err) {
-        throw new Error("Unable to trim video: " + err);
-    }
-}
+// export let trimVideo = async (videoByteStream, startTime, endTime) => {
+//     var buffer = Buffer.from(videoByteStream, "base64");
+//     var inputFilePath = `/tmp/working/${uuidv4()}-in.mp4`;
+//     var outputFilePath = `/tmp/working/${uuidv4()}-in.mp4`;
+//     try {
+//         await writeFile(inputFilePath, buffer);
+//         await processVideo(inputFilePath, outputFilePath, startTime, endTime - startTime);
+//         return await readFile(outputFilePath);
+//     } catch (err) {
+//         throw new Error("Unable to trim video: " + err);
+//     }
+// }
 
 export let convertSubtitlesToSrt = (subtitles) => {
     return subtitles.map((subtitle, index) => {
