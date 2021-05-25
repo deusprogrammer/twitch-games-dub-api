@@ -38,11 +38,9 @@ router.route("/")
         }
 
         let twitchUserId = getAuthenticatedTwitchUserId(request);
-
-        let buffer = Buffer.from(request.body.videoPayload, "base64");
         
         try {
-            let video = await storeVideo(request.body.name, buffer, twitchUserId, request.body.subtitles);
+            let video = await storeVideo(request.body.name, request.body.videoUrl, twitchUserId, request.body.subtitles);
             return response.json(video);
         } catch (error) {
             console.error(error);

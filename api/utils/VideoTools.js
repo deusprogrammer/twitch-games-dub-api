@@ -49,17 +49,10 @@ let convertSecondsToTimestamp = (seconds) => {
     return `${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")},${ms.toString().padStart(3, "0")}`;
 }
 
-export let storeVideo = async (name, base64ByteStream, twitchUserId, subtitles) => {
+export let storeVideo = async (name, videoUrl, twitchUserId, subtitles) => {
     //var videoPath = `${GAME_DATA_BASE}/videos/${uuidv4()}.mp4`;
 
     try {
-        //await writeFile(videoPath, videoByteStream);
-        let result = await axios.post("https://deusprogrammer.com/api/img-svc/media", {
-            imagePayload: base64ByteStream,
-            mimeType: "video/mp4",
-            title: name
-        });
-        let videoUrl = `https://deusprogrammer.com/api/img-svc/media/${result.data._id}/file`;
         return await Videos.create({
             name,
             videoUrl,
