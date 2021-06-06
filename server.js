@@ -48,4 +48,4 @@ app.use('/videos', passport.authenticate("jwt", { session: false }), videoRoutes
 //app.use('/videos', videoRoutes);
 
 app.listen(port);
-console.log('budget RESTful API server started on: ' + port);
+console.log('What the Dub RESTful API server started on: ' + port);
